@@ -1,4 +1,4 @@
-# utf-8 python3
+# -*- coding: utf-8 -*-
 import numpy as np
 from numpy.random import *
 import scipy as scip
