@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from numpy.random import *
 import scipy as scip
 import matplotlib.pyplot as plt
 
@@ -35,13 +34,13 @@ if __name__ == '__main__':
     N = 1000
     x = np.linspace(-3, 3, n)[np.newaxis]
     xr = np.linspace(-3, 3, N)[np.newaxis]
-    y = np.sin(np.pi * x) / (np.pi * x) + 0.1 * x + 0.4 * rand(50)
+    y = np.sin(np.pi * x) / (np.pi * x) + 0.1 * x + 0.4 * np.random.rand(50)
     # 回帰
     par = 0.5
     lam = 0.2
-    K = gaussker1(x, lam)
-    theta = np.linalg.solve(np.dot(K, K) + par * np.matrix(np.identity(n)), np.dot(K.T, y.T))
-    KK = gaussker2(x, xr, lam)
+    K = gaussker1(x, par)
+    theta = np.linalg.solve(np.dot(K, K) + lam * np.matrix(np.identity(n)), np.dot(K.T, y.T))
+    KK = gaussker2(x, xr, par)
     t = np.dot(KK, theta)
     plt.scatter(x, y)
     plt.plot(xr.T, t)
