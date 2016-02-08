@@ -4,6 +4,7 @@
 
 ```python
 import numpy as np
+import numpy.matlib
 import scipy as scip
 import matplotlib.pyplot as plt
 %matplotlib inline
@@ -11,30 +12,12 @@ import matplotlib.pyplot as plt
 
 
 ```python
-# ガウスカーネル計画行列を作成
-# 1:学習時(input:d行が次元でn列のデータ)
 def gaussker1(X, sigma):
-    S = np.dot(X.T, X)
-    size = np.shape(X)[1]
-    s1 = np.zeros((size, size))
-    s2 = np.zeros((size, size))
-    for i in range(0, size):
-        s1[i, :] = S[i, i]
-        s2[:, i] = S[i, i]
-    return scip.exp(-(s1 + s2 - 2 * S) / (2 * sigma ** 2))
-# 2:出力時
+    X_sum = np.sum(X**2, 0)[np.newaxis]
+    shape = np.size(X_sum)
+    return scip.exp(-(np.matlib.repmat(X_sum.T, 1, shape) + np.matlib.repmat(X_sum, shape, 1) -2 * np.dot(X.T, X))/(2 * sigma ** 2))
 def gaussker2(x, X, sigma):
-    n1 = np.shape(x)[1]
-    n2 = np.shape(X)[1]
-    Sx = np.dot(x.T, x)
-    SX = np.dot(X.T, X)
-    s1 = np.zeros((n2, n1))
-    s2 = np.zeros((n2, n1))
-    for i in range(0, n2):
-        s1[i, :] = SX[i, i]
-    for i in range(0, n1):
-        s2[:, i] = Sx[i, i]
-    return scip.exp(-(s1 + s2 - 2 * np.dot(X.T, x)) / (2 * sigma ** 2))
+    return scip.exp(-(np.matlib.repmat((x ** 2), np.size(X), 1) + np.matlib.repmat((X ** 2).T, 1, np.size(x)) -2 * np.dot(X.T, x))/(2 * sigma ** 2))
 ```
 
 ### 過学習の例
@@ -152,7 +135,7 @@ sigma = 2
 Ridge_crossval(x, xr, y , sigma, sigma, fold)
 ```
 
-    1.47919064663
+    1.31253810938
     
 
 
@@ -166,7 +149,7 @@ sigma = 0.5
 Ridge_crossval(x, xr, y, lam, sigma, fold)
 ```
 
-    0.218190503607
+    0.189267772811
     
 
 
@@ -180,7 +163,7 @@ sigma = 2
 Ridge_crossval(x, xr, y, lam, sigma, fold)
 ```
 
-    1.4681712107
+    1.31492185883
     
 
 
@@ -194,7 +177,7 @@ sigma = 0.5
 Ridge_crossval(x, xr, y, lam, sigma, fold)
 ```
 
-    0.211270333532
+    0.168502433054
     
 
 

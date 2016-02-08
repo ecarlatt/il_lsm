@@ -4,6 +4,7 @@
 
 ```python
 import numpy as np
+import numpy.matlib
 import scipy as scip
 import matplotlib.pyplot as plt
 %matplotlib inline
@@ -22,7 +23,7 @@ plt.scatter(x, y)
 
 
 
-    <matplotlib.collections.PathCollection at 0x25162512a20>
+    <matplotlib.collections.PathCollection at 0x1bcab858c50>
 
 
 
@@ -43,7 +44,7 @@ plt.scatter(x,y)
 
 
 
-    <matplotlib.collections.PathCollection at 0x25164ade7f0>
+    <matplotlib.collections.PathCollection at 0x1bcac0e3eb8>
 
 
 
@@ -65,7 +66,7 @@ plt.scatter(x, y)
 
 
 
-    <matplotlib.collections.PathCollection at 0x25164b4b0f0>
+    <matplotlib.collections.PathCollection at 0x1bcac1516d8>
 
 
 
@@ -99,7 +100,7 @@ plt.scatter(x, y)
 
 
 
-    <matplotlib.collections.PathCollection at 0x25164bb7668>
+    <matplotlib.collections.PathCollection at 0x1bcac1bd908>
 
 
 
@@ -176,30 +177,12 @@ plt.scatter(x, y); plt.ylim([-5,5])
 
 
 ```python
-# いつもの
-# 1:学習時(input:d行が次元でn列のデータ)
-def gaussker1(X,sigma):
-    S = np.dot(X.T,X)
-    size = np.shape(X)[1]
-    s1 = np.zeros((size,size))
-    s2 = np.zeros((size,size))
-    for i in range(0,size):
-        s1[i,:] = S[i,i] 
-        s2[:,i] = S[i,i]
-    return scip.exp(-(s1+s2-2*S)/(2*sigma**2))
-# 2:出力時
-def gaussker2(x,X,sigma):
-    n1 = np.shape(x)[1]
-    n2 = np.shape(X)[1]
-    Sx = np.dot(x.T,x)
-    SX = np.dot(X.T,X)
-    s1 = np.zeros((n2,n1))
-    s2 = np.zeros((n2,n1))
-    for i in range(0,n2):
-        s1[i,:] = SX[i,i]
-    for i in range(0,n1):
-        s2[:,i] = Sx[i,i]
-    return scip.exp(-(s1+s2-2*np.dot(X.T,x))/(2*sigma**2))
+def gaussker1(X, sigma):
+    X_sum = np.sum(X**2, 0)[np.newaxis]
+    shape = np.size(X_sum)
+    return scip.exp(-(np.matlib.repmat(X_sum.T, 1, shape) + np.matlib.repmat(X_sum, shape, 1) -2 * np.dot(X.T, X))/(2 * sigma ** 2))
+def gaussker2(x, X, sigma):
+    return scip.exp(-(np.matlib.repmat((x ** 2), np.size(X), 1) + np.matlib.repmat((X ** 2).T, 1, np.size(x)) -2 * np.dot(X.T, x))/(2 * sigma ** 2))
 # 線の出力
 def expfig(x, xr, theta, sigma):
     KK = gaussker2(x, xr, sigma)
@@ -222,7 +205,7 @@ plt.scatter(x, y)
 
 
 
-    <matplotlib.collections.PathCollection at 0x25164cf2d68>
+    <matplotlib.collections.PathCollection at 0x1bcac36f320>
 
 
 
@@ -265,7 +248,7 @@ plt.legend()
 
 
 
-    <matplotlib.legend.Legend at 0x25165624080>
+    <matplotlib.legend.Legend at 0x1bcacc9d0f0>
 
 
 
@@ -302,7 +285,7 @@ plt.scatter(x, y)
 
 
 
-    <matplotlib.collections.PathCollection at 0x251655f0cf8>
+    <matplotlib.collections.PathCollection at 0x1bcac37add8>
 
 
 
@@ -363,19 +346,19 @@ def Lasso_Huber_crossval(x, xr, y, lam, sigma, eta, fold):
 ```python
 sigma = 0.3
 lam = 0.1
-eta = 0.1
+eta = 0.05
 fold = 4
 Lasso_Huber_crossval(x, xr, y, lam, sigma, eta, fold)
 plt.scatter(x, y)
 ```
 
-    1.92163506006
+    1.5755616057
     
 
 
 
 
-    <matplotlib.collections.PathCollection at 0x251607bb8d0>
+    <matplotlib.collections.PathCollection at 0x1bca9a7b2b0>
 
 
 
@@ -392,13 +375,13 @@ Lasso_Huber_crossval(x, xr, y, lam, sigma, eta, fold)
 plt.scatter(x, y)
 ```
 
-    1.77115282689
+    1.53115219365
     
 
 
 
 
-    <matplotlib.collections.PathCollection at 0x25160826b38>
+    <matplotlib.collections.PathCollection at 0x1bcac31b898>
 
 
 
@@ -415,13 +398,13 @@ Lasso_Huber_crossval(x, xr, y, lam, sigma, eta, fold)
 plt.scatter(x, y)
 ```
 
-    1.81012035145
+    1.79710376382
     
 
 
 
 
-    <matplotlib.collections.PathCollection at 0x25160890b38>
+    <matplotlib.collections.PathCollection at 0x1bcac24c9e8>
 
 
 
@@ -438,13 +421,13 @@ Lasso_Huber_crossval(x, xr, y, lam, sigma, eta, fold)
 plt.scatter(x, y)
 ```
 
-    2.45932643706
+    1.99626901441
     
 
 
 
 
-    <matplotlib.collections.PathCollection at 0x251608f9b38>
+    <matplotlib.collections.PathCollection at 0x1bcac2ea160>
 
 
 

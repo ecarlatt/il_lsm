@@ -3,8 +3,8 @@
 
 
 ```python
-#utf-8 python3
 import numpy as np
+import numpy.matlib
 import scipy as scip
 import matplotlib.pyplot as plt
 from sklearn import linear_model, datasets
@@ -24,7 +24,7 @@ plt.scatter(regdata[0],regdata[1])
 
 
 
-    <matplotlib.collections.PathCollection at 0x1ea9853a828>
+    <matplotlib.collections.PathCollection at 0x1eed79e11d0>
 
 
 
@@ -48,7 +48,7 @@ plt.scatter(regdata[0],regdata[1])
 
 
 
-    <matplotlib.collections.PathCollection at 0x1ea98cacc50>
+    <matplotlib.collections.PathCollection at 0x1eed82ad668>
 
 
 
@@ -74,7 +74,7 @@ plt.scatter(x,y)
 
 
 
-    <matplotlib.collections.PathCollection at 0x1ea9a352898>
+    <matplotlib.collections.PathCollection at 0x1eed831d400>
 
 
 
@@ -84,39 +84,24 @@ plt.scatter(x,y)
 
 
 ```python
-#ガウスカーネル計画行列を作成
-#1:学習時(input:d行が次元でn列のデータ)
-def gaussker1(X,sigma):
-    S = np.dot(X.T,X)
-    size = np.shape(X)[1]
-    s1 = np.zeros((size,size))
-    s2 = np.zeros((size,size))
-    for i in range(0,size):
-        s1[i,:] = S[i,i] 
-        s2[:,i] = S[i,i]
-    return scip.exp(-(s1+s2-2*S)/(2*sigma**2))
-#2:出力時
-def gaussker2(x,X,sigma):
-    n1 = np.shape(x)[1]
-    n2 = np.shape(X)[1]
-    Sx = np.dot(x.T,x)
-    SX = np.dot(X.T,X)
-    s1 = np.zeros((n2,n1))
-    s2 = np.zeros((n2,n1))
-    for i in range(0,n2):
-        s1[i,:] = SX[i,i]
-    for i in range(0,n1):
-        s2[:,i] = Sx[i,i]
-    return scip.exp(-(s1+s2-2*np.dot(X.T,x))/(2*sigma**2))
+# ガウスカーネル計画行列を作成
+# 1:学習時(input:d行が次元でn列のデータ)
+def gaussker1(X, sigma):
+    X_sum = np.sum(X**2, 0)[np.newaxis]
+    shape = np.size(X_sum)
+    return scip.exp(-(np.matlib.repmat(X_sum.T, 1, shape) + np.matlib.repmat(X_sum, shape, 1) -2 * np.dot(X.T, X))/(2 * sigma ** 2))
+# 2:出力時
+def gaussker2(x, X, sigma):
+    return scip.exp(-(np.matlib.repmat((x ** 2), np.size(X), 1) + np.matlib.repmat((X ** 2).T, 1, np.size(x)) -2 * np.dot(X.T, x))/(2 * sigma ** 2))
 ```
 
 
 ```python
 #回帰
-lam=2*0.3**2
-K = gaussker1(x,lam)
+sigma=0.3
+K = gaussker1(x,sigma)
 theta = np.linalg.solve(K,y.T)
-KK = gaussker2(x,xr,lam)
+KK = gaussker2(x,xr,sigma)
 t = np.dot(KK,theta)
 plt.scatter(x,y)
 plt.plot(xr.T,t)

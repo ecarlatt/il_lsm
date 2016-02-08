@@ -4,33 +4,16 @@
 
 ```python
 import numpy as np
+import numpy.matlib
 import scipy as scip
 import matplotlib.pyplot as plt
 %matplotlib inline
-# ガウスカーネル計画行列を作成
-# 1:学習時(input:d行が次元でn列のデータ)
 def gaussker1(X, sigma):
-    S = np.dot(X.T, X)
-    size = np.shape(X)[1]
-    s1 = np.zeros((size, size))
-    s2 = np.zeros((size, size))
-    for i in range(0, size):
-        s1[i, :] = S[i, i]
-        s2[:, i] = S[i, i]
-    return scip.exp(-(s1 + s2 - 2 * S) / (2 * sigma ** 2))
-# 2:出力時
+    X_sum = np.sum(X**2, 0)[np.newaxis]
+    shape = np.size(X_sum)
+    return scip.exp(-(np.matlib.repmat(X_sum.T, 1, shape) + np.matlib.repmat(X_sum, shape, 1) -2 * np.dot(X.T, X))/(2 * sigma ** 2))
 def gaussker2(x, X, sigma):
-    n1 = np.shape(x)[1]
-    n2 = np.shape(X)[1]
-    Sx = np.dot(x.T, x)
-    SX = np.dot(X.T, X)
-    s1 = np.zeros((n2, n1))
-    s2 = np.zeros((n2, n1))
-    for i in range(0, n2):
-        s1[i, :] = SX[i, i]
-    for i in range(0, n1):
-        s2[:, i] = Sx[i, i]
-    return scip.exp(-(s1 + s2 - 2 * np.dot(X.T, x)) / (2 * sigma ** 2))
+    return scip.exp(-(np.matlib.repmat((x ** 2), np.size(X), 1) + np.matlib.repmat((X ** 2).T, 1, np.size(x)) -2 * np.dot(X.T, x))/(2 * sigma ** 2))
 ```
 
 ### Lasso
@@ -50,7 +33,7 @@ plt.scatter(x,y)
 
 
 
-    <matplotlib.collections.PathCollection at 0x2b965577978>
+    <matplotlib.collections.PathCollection at 0x2958dd4ba20>
 
 
 
@@ -95,12 +78,11 @@ plt.xlim([-3, 3])
 print(theta[theta > 0.0001])
 ```
 
-    [  3.70356476e-04   2.24918908e-03   7.49546595e-04   3.53762279e-04
-       1.22022925e-01   6.58753700e-01   1.85802606e-01   1.07136546e-01
-       1.51588333e-01   7.36386676e-02   6.78624104e-02   4.39073835e-01
-       2.42086410e-01   3.95284043e-02   1.86496341e-04   9.94012044e-02
-       4.62920411e-02   2.78323071e-01   4.62079334e-02   3.56275401e-01
-       2.24426283e-02]
+    [  8.53020878e-02   5.20415448e-04   3.29067994e-01   5.49472655e-02
+       5.76577389e-02   6.74889297e-01   1.43628575e-02   1.88140593e-01
+       7.22102049e-01   1.64639606e-02   2.47892719e-02   5.35450344e-02
+       2.25115658e-02   5.31954368e-03   3.10864509e-01   1.28745547e-01
+       5.44243864e-02   3.00042113e-01]
     
 
 ### Lasso CV
@@ -176,7 +158,7 @@ plt.scatter(x, y)
 plt.xlim([-3, 3])
 ```
 
-    0.285021737485
+    0.468384561304
     
 
 
@@ -199,7 +181,7 @@ plt.scatter(x, y)
 plt.xlim([-3, 3])
 ```
 
-    0.41031677326
+    0.669178034062
     
 
 
@@ -222,7 +204,7 @@ plt.scatter(x, y)
 plt.xlim([-3, 3])
 ```
 
-    0.320255156926
+    0.356587970794
     
 
 
@@ -245,7 +227,7 @@ plt.scatter(x, y)
 plt.xlim([-3, 3])
 ```
 
-    0.313877461133
+    0.579448503492
     
 
 
@@ -268,7 +250,7 @@ plt.scatter(x, y)
 plt.xlim([-3, 3])
 ```
 
-    0.259251369409
+    0.389371565578
     
 
 
